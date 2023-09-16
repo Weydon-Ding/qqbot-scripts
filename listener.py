@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def get_random_usagi_pic()->str:
-    return f'usagi/{random.randint(0, 9)}.gif'
+    return f'usagi/{random.randint(0, 10)}.gif'
 
 
 @app.route('/', methods=['POST'])
@@ -42,19 +42,33 @@ def receive_post_data():
                     message_type = data['message_type']
                     match message_type:
                         case 'private':
-                            response = requests.post(f'http://{CQHTTP_HOST}/send_private_msg?user_id={data["user_id"]}&message={data["message"]}&auto_escape=false', timeout=1000)
+                            if '呀哈！' in data['message']:
+                                msg = "[CQ:record,file=usagi.mp3]"
+                            else:
+                                msg = data["message"]
+                            response = requests.post(f'http://{CQHTTP_HOST}/send_private_msg?user_id={data["user_id"]}&message={msg}&auto_escape=false', timeout=1000)
                             return response.text, response.status_code
                         case 'group':
                             sub_str = '[CQ:at,qq=3596295889]'
                             if sub_str in data['message']:
-                                msg = data['message'].replace(sub_str, '').strip()
+                                if '呀哈！' in data['message']:
+                                    msg = "[CQ:record,file=usagi.mp3]"
+                                elif '自言自语' in data['message'] or '小八唱歌' in data['message'] or '哈吉唱歌' in data['message']:
+                                    msg = "[CQ:record,file=ひとりごつ.mp3]"
+                                    response = requests.post(f'http://{CQHTTP_HOST}/send_group_msg?group_id={data["group_id"]}&message={msg}&auto_escape=false', timeout=1000)
+                                    msg = '[CQ:image,file=hachi.gif]'
+                                else:
+                                    msg = data['message'].replace(sub_str, '').strip()
                                 response = requests.post(f'http://{CQHTTP_HOST}/send_group_msg?group_id={data["group_id"]}&message={msg}&auto_escape=false', timeout=1000)
                                 return response.text, response.status_code
                 case 'notice':
                     notice_type = data['notice_type']
                     match notice_type:
                         case 'group_increase':
-                            response = requests.post(f'http://{CQHTTP_HOST}/send_group_msg?group_id={data["group_id"]}&message=欢迎新人[CQ:at,qq={data["user_id"]}]&auto_escape=false', timeout=1000)
+                            message = f'欢迎新人[CQ:at,qq={data["user_id"]}]'
+                            if '707363327' == str(data["group_id"]):
+                                message += '[CQ:image,file=0.jpg]'
+                            response = requests.post(f'http://{CQHTTP_HOST}/send_group_msg?group_id={data["group_id"]}&message={message}&auto_escape=false', timeout=1000)
                             return response.text, response.status_code
                         case 'notify':
                             if data['target_id'] == data['self_id']:
