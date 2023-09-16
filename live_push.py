@@ -29,7 +29,7 @@ room_list = [
         'qq_person': 0,
         'msg': [
             '{name}尚未开播',
-            '{name}正在直播：{title} https:',
+            '{name}正在直播：{title} https://live.bilibili.com/{room_id}',
             '{name}正在轮播',
         ],
     },
@@ -55,7 +55,7 @@ room_list = [
         'qq_person': 0,
         'msg': [
             '{name}尚未开播',
-            '{name}正在直播：{title} https:',
+            '{name}正在直播：{title} https://live.bilibili.com/{room_id}',
             '{name}正在轮播',
         ],
     },
